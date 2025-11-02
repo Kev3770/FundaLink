@@ -1,0 +1,752 @@
+DOCUMENTACIÓN BACKEND - PROYECTO FUNDALink
+Sistema de Información Institucional para FUNDAESTÉCNICOS - Backend
+Versión: 1.0.0
+Fecha: Octubre 30, 2025
+Desarrollador: Kevin Alejandro Peña Ramírez
+Stack Backend: Node.js + Express.js + MongoDB + Mongoose
+
+📊 ÍNDICE
+
+Resumen del Backend
+Configuración Inicial
+Estructura del Proyecto
+Modelos de Datos
+Controladores
+Rutas (Endpoints)
+Middlewares
+Utilidades
+Sistema de Autenticación
+Variables de Entorno
+Scripts NPM
+Guía de Instalación
+
+
+<a name="resumen-backend"></a>
+1. 📋 RESUMEN DEL BACKEND
+1.1 Descripción General
+API RESTful desarrollada en Node.js con Express que proporciona servicios para la gestión integral de la institución educativa FUNDAESTÉCNICOS.
+1.2 Características Principales
+
+✅ API REST con arquitectura MVC
+✅ Autenticación JWT con doble sistema (Usuarios/Estudiantes)
+✅ Sistema de roles y permisos
+✅ Encriptación de contraseñas con bcrypt
+✅ Base de datos MongoDB con Mongoose ODM
+✅ CORS habilitado para comunicación con frontend
+✅ Validaciones en modelos y controladores
+✅ Soft delete (eliminación lógica)
+✅ Auditoría de acciones (creado por, actualizado por)
+✅ Paginación en listados
+✅ Filtros y búsquedas avanzadas
+
+1.3 Tecnologías Utilizadas
+TecnologíaVersiónPropósitoNode.jsv18+Entorno de ejecuciónExpress.js^4.18.2Framework webMongoDBv8.2.1Base de datos NoSQLMongoose^7.6.3ODM para MongoDBbcryptjs^2.4.3Encriptación de contraseñasjsonwebtoken^9.0.2Tokens JWTcors^2.8.5Cross-Origin Resource Sharingdotenv^16.3.1Variables de entornonodemon^3.0.1Auto-reinicio en desarrollo
+
+<a name="configuracion-inicial"></a>
+2. ⚙️ CONFIGURACIÓN INICIAL
+2.1 Requisitos Previos
+
+Node.js v18 o superior
+MongoDB v8.2.1 (local o remoto)
+NPM o Yarn
+Git
+Editor de código (VS Code recomendado)
+
+2.2 Instalación de Dependencias
+bash# Navegar a la carpeta del backend
+cd backend
+
+# Instalar dependencias de producción
+npm install express cors dotenv mongoose
+
+# Instalar dependencias de autenticación
+npm install bcryptjs jsonwebtoken
+
+# Instalar dependencias de desarrollo
+npm install --save-dev nodemon
+2.3 Configuración de MongoDB
+Opción 1: MongoDB Local
+bash# Iniciar servicio de MongoDB (Windows)
+mongod
+
+# En otra terminal, verificar conexión
+mongosh
+```
+
+### Opción 2: MongoDB Atlas (Cloud)
+1. Crear cuenta en [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+2. Crear un cluster gratuito
+3. Configurar usuario de base de datos
+4. Obtener string de conexión
+5. Agregar a archivo `.env`
+
+---
+
+<a name="estructura-proyecto"></a>
+# 3. 📂 ESTRUCTURA DEL PROYECTO
+```
+backend/
+│
+├── src/
+│   ├── config/
+│   │   └── database.js                    # Configuración de MongoDB
+│   │
+│   ├── controllers/
+│   │   ├── noticia.controller.js          # Controlador de noticias
+│   │   ├── evento.controller.js           # Controlador de eventos
+│   │   ├── usuario.controller.js          # Controlador de usuarios
+│   │   ├── testimonio.controller.js       # Controlador de testimonios
+│   │   ├── programa.controller.js         # Controlador de programas
+│   │   └── estudiante.controller.js       # Controlador de estudiantes
+│   │
+│   ├── models/
+│   │   ├── noticia.model.js               # Modelo de noticias
+│   │   ├── evento.model.js                # Modelo de eventos
+│   │   ├── usuario.model.js               # Modelo de usuarios
+│   │   ├── testimonio.model.js            # Modelo de testimonios
+│   │   ├── programa.model.js              # Modelo de programas
+│   │   └── estudiante.model.js            # Modelo de estudiantes
+│   │
+│   ├── routes/
+│   │   ├── test.routes.js                 # Rutas de prueba
+│   │   ├── noticia.routes.js              # Rutas de noticias
+│   │   ├── evento.routes.js               # Rutas de eventos
+│   │   ├── usuario.routes.js              # Rutas de usuarios
+│   │   ├── testimonio.routes.js           # Rutas de testimonios
+│   │   ├── programa.routes.js             # Rutas de programas
+│   │   └── estudiante.routes.js           # Rutas de estudiantes
+│   │
+│   ├── middlewares/
+│   │   └── auth.middleware.js             # Middleware de autenticación y roles
+│   │
+│   ├── services/                          # (Reservado para lógica de negocio compleja)
+│   │
+│   ├── utils/
+│   │   └── jwt.utils.js                   # Funciones de utilidad JWT
+│   │
+│   ├── app.js                             # Configuración de Express
+│   └── server.js                          # Punto de entrada del servidor
+│
+├── .env                                   # Variables de entorno (NO subir a Git)
+├── .gitignore                             # Archivos ignorados por Git
+├── package.json                           # Dependencias y scripts
+└── package-lock.json                      # Lock de dependencias
+
+<a name="modelos-datos"></a>
+4. 🗃️ MODELOS DE DATOS
+4.1 Usuario (usuario.model.js)
+Descripción
+Modelo para administradores del sistema con diferentes niveles de acceso.
+Schema
+javascript{
+  nombre: String (required, trim),
+  apellido: String (required, trim),
+  email: String (required, unique, lowercase, trim, validación regex),
+  password: String (required, minlength: 6, select: false),
+  rol: Enum ['superadmin', 'admin', 'editor'] (default: 'editor'),
+  activo: Boolean (default: true),
+  ultimoAcceso: Date,
+  timestamps: true (createdAt, updatedAt)
+}
+Métodos
+
+compararPassword(passwordIngresado): Compara password con bcrypt
+
+Hooks
+
+pre('save'): Encripta password antes de guardar
+
+Virtuals
+
+nombreCompleto: Retorna nombre + apellido
+
+Índices
+
+email: índice único
+
+
+4.2 Estudiante (estudiante.model.js)
+Descripción
+Modelo para estudiantes matriculados con acceso mediante código único.
+Schema
+javascript{
+  // Información Personal
+  nombre: String (required, trim),
+  apellido: String (required, trim),
+  documento: {
+    tipo: Enum ['CC', 'TI', 'CE', 'Pasaporte'] (required),
+    numero: String (required, unique, trim)
+  },
+  email: String (required, unique, lowercase, trim, validación regex),
+  telefono: String (required, trim),
+  fechaNacimiento: Date (required),
+  genero: Enum ['Masculino', 'Femenino', 'Otro', 'Prefiero no decir'],
+  direccion: {
+    calle: String,
+    ciudad: String,
+    departamento: String,
+    codigoPostal: String
+  },
+  
+  // Información Académica
+  programa: ObjectId (ref: 'Programa', required),
+  codigoEstudiante: String (required, unique, uppercase, trim),
+  codigoAcceso: String (required, unique, select: false),
+  estado: Enum ['activo', 'inactivo', 'graduado', 'retirado', 'suspendido'],
+  jornada: Enum ['Diurna', 'Nocturna', 'Mixta', 'Fines de semana'] (required),
+  fechaInscripcion: Date (default: Date.now),
+  fechaInicio: Date,
+  fechaGraduacion: Date,
+  
+  // Contacto de Emergencia
+  contactoEmergencia: {
+    nombre: String (required),
+    relacion: String (required),
+    telefono: String (required)
+  },
+  
+  // Adicional
+  foto: String,
+  observaciones: String,
+  activo: Boolean (default: true),
+  ultimoAcceso: Date,
+  
+  // Auditoría
+  creadoPor: ObjectId (ref: 'Usuario'),
+  actualizadoPor: ObjectId (ref: 'Usuario'),
+  timestamps: true
+}
+Métodos
+
+compararCodigoAcceso(codigoIngresado): Compara código con bcrypt
+
+Hooks
+
+pre('save'): Genera código de estudiante automático (EST + AÑO + CONSECUTIVO)
+pre('save'): Encripta código de acceso
+
+Virtuals
+
+nombreCompleto: Retorna nombre + apellido
+edad: Calcula edad desde fechaNacimiento
+documentoCompleto: Retorna tipo + numero
+
+Índices
+
+documento.numero: índice único
+email: índice único
+codigoEstudiante: índice único
+nombre, apellido: índice de texto (para búsquedas)
+
+
+4.3 Noticia (noticia.model.js)
+Descripción
+Modelo para noticias y anuncios institucionales.
+Schema
+javascript{
+  titulo: String (required, trim, maxlength: 200),
+  contenido: String (required),
+  imagen: String,
+  autor: String (required, default: 'Administrador FUNDAESTÉCNICOS'),
+  categoria: Enum ['Académica', 'Administrativa', 'Evento', 'General'],
+  destacada: Boolean (default: false),
+  activa: Boolean (default: true),
+  fechaPublicacion: Date (default: Date.now),
+  creadoPor: ObjectId (ref: 'Usuario'),
+  actualizadoPor: ObjectId (ref: 'Usuario'),
+  timestamps: true
+}
+Índices
+
+titulo, contenido: índice de texto (para búsquedas)
+
+
+4.4 Evento (evento.model.js)
+Descripción
+Modelo para eventos institucionales con sistema de inscripción.
+Schema
+javascript{
+  nombre: String (required, trim, maxlength: 200),
+  descripcion: String (required),
+  fecha: Date (required),
+  horaInicio: String (required),
+  horaFin: String,
+  lugar: String (required),
+  imagen: String,
+  tipo: Enum ['Académico', 'Cultural', 'Deportivo', 'Institucional', 'Social'],
+  capacidadMaxima: Number (null = ilimitado),
+  inscritosCount: Number (default: 0),
+  requiereInscripcion: Boolean (default: false),
+  destacado: Boolean (default: false),
+  activo: Boolean (default: true),
+  organizador: String (default: 'FUNDAESTÉCNICOS'),
+  creadoPor: ObjectId (ref: 'Usuario'),
+  actualizadoPor: ObjectId (ref: 'Usuario'),
+  timestamps: true
+}
+Virtuals
+
+esPasado: Retorna true si fecha < Date.now()
+estaLleno: Retorna true si inscritosCount >= capacidadMaxima
+
+
+4.5 Testimonio (testimonio.model.js)
+Descripción
+Modelo para testimonios de estudiantes y egresados con sistema de aprobación.
+Schema
+javascript{
+  nombre: String (required, trim, maxlength: 100),
+  apellido: String (required, trim, maxlength: 100),
+  email: String (required, lowercase, trim, validación regex),
+  foto: String,
+  testimonio: String (required, minlength: 50, maxlength: 1000),
+  programa: String (required, trim),
+  promocion: String (required, trim),
+  ocupacionActual: String (trim),
+  empresaActual: String (trim),
+  calificacion: Number (min: 1, max: 5, default: 5),
+  destacado: Boolean (default: false),
+  aprobado: Boolean (default: false),
+  activo: Boolean (default: true),
+  fechaPublicacion: Date,
+  aprobadoPor: ObjectId (ref: 'Usuario'),
+  fechaAprobacion: Date,
+  timestamps: true
+}
+Virtuals
+
+nombreCompleto: Retorna nombre + apellido
+
+Índices
+
+nombre, apellido, testimonio: índice de texto
+
+
+4.6 Programa (programa.model.js)
+Descripción
+Modelo para programas educativos ofrecidos por la institución.
+Schema
+javascript{
+  nombre: String (required, unique, trim, maxlength: 200),
+  codigo: String (required, unique, uppercase, trim, maxlength: 20),
+  descripcion: String (required, minlength: 100),
+  duracion: {
+    valor: Number (required),
+    unidad: Enum ['meses', 'años', 'semestres']
+  },
+  modalidad: Enum ['Presencial', 'Virtual', 'Semipresencial'] (required),
+  jornada: Enum ['Diurna', 'Nocturna', 'Mixta', 'Fines de semana'],
+  requisitos: [String] (required, min: 1),
+  objetivos: String (required),
+  perfilEgresado: String (required),
+  competencias: [String],
+  campoLaboral: String,
+  materias: [String],
+  imagen: String,
+  costos: {
+    matricula: Number (required, min: 0),
+    mensualidad: Number (required, min: 0),
+    totalPrograma: Number (calculado automáticamente),
+    moneda: String (default: 'COP')
+  },
+  inscripcion: {
+    disponible: Boolean (default: true),
+    cuposDisponibles: Number (null = ilimitado),
+    cuposOcupados: Number (default: 0),
+    fechaInicio: Date,
+    fechaCierre: Date
+  },
+  activo: Boolean (default: true),
+  destacado: Boolean (default: false),
+  orden: Number (default: 0),
+  creadoPor: ObjectId (ref: 'Usuario'),
+  actualizadoPor: ObjectId (ref: 'Usuario'),
+  timestamps: true
+}
+Hooks
+
+pre('save'): Calcula costos.totalPrograma basado en duración
+
+Virtuals
+
+tieneCupos: Retorna true si hay cupos disponibles
+cuposRestantes: Retorna cupos disponibles - cupos ocupados
+duracionTexto: Retorna "X meses/años/semestres"
+
+Índices
+
+nombre, descripcion: índice de texto
+codigo: índice único
+
+
+<a name="controladores"></a>
+5. 🎮 CONTROLADORES
+5.1 Estructura General de Controladores
+Todos los controladores siguen un patrón consistente:
+javascript// Importar modelo
+const Modelo = require('../models/modelo.model');
+
+// Función del controlador
+const funcionControlador = async (req, res) => {
+  try {
+    // Lógica del controlador
+    
+    // Respuesta exitosa
+    res.status(200).json({
+      success: true,
+      message: 'Mensaje descriptivo',
+      data: resultado
+    });
+    
+  } catch (error) {
+    // Manejo de errores
+    res.status(400 o 500).json({
+      success: false,
+      message: 'Mensaje de error',
+      error: error.message
+    });
+  }
+};
+
+module.exports = { funcionControlador };
+
+5.2 Usuario Controller (usuario.controller.js)
+Funciones Implementadas
+registrarUsuario(req, res)
+Descripción: Registra un nuevo usuario administrador
+Requiere Auth: No (primer usuario) / Sí (usuarios subsiguientes)
+Rol Requerido: superadmin (para crear más usuarios)
+Request Body:
+json{
+  "nombre": "Kevin",
+  "apellido": "Peña",
+  "email": "admin@fundaestecnicos.edu.co",
+  "password": "admin123",
+  "rol": "superadmin"
+}
+Response:
+json{
+  "success": true,
+  "message": "Usuario registrado exitosamente",
+  "data": {
+    "id": "...",
+    "nombre": "Kevin",
+    "apellido": "Peña",
+    "email": "admin@fundaestecnicos.edu.co",
+    "rol": "superadmin"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+loginUsuario(req, res)
+Descripción: Autentica un usuario y genera token JWT
+Requiere Auth: No
+Request Body:
+json{
+  "email": "admin@fundaestecnicos.edu.co",
+  "password": "admin123"
+}
+Response:
+json{
+  "success": true,
+  "message": "Login exitoso",
+  "data": {
+    "id": "...",
+    "nombre": "Kevin",
+    "apellido": "Peña",
+    "nombreCompleto": "Kevin Peña",
+    "email": "admin@fundaestecnicos.edu.co",
+    "rol": "superadmin",
+    "ultimoAcceso": "2025-10-30T..."
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+obtenerPerfil(req, res)
+Descripción: Obtiene perfil del usuario autenticado
+Requiere Auth: Sí
+Rol Requerido: Cualquier usuario autenticado
+obtenerUsuarios(req, res)
+Descripción: Lista todos los usuarios
+Requiere Auth: Sí
+Rol Requerido: superadmin
+actualizarUsuario(req, res)
+Descripción: Actualiza datos de un usuario
+Requiere Auth: Sí
+Rol Requerido: superadmin
+cambiarPassword(req, res)
+Descripción: Cambia contraseña del usuario autenticado
+Requiere Auth: Sí
+Request Body:
+json{
+  "passwordActual": "admin123",
+  "passwordNuevo": "nuevaPassword456"
+}
+desactivarUsuario(req, res)
+Descripción: Desactiva un usuario (soft delete)
+Requiere Auth: Sí
+Rol Requerido: superadmin
+
+5.3 Estudiante Controller (estudiante.controller.js)
+Funciones Implementadas
+registrarEstudiante(req, res)
+Descripción: Registra un nuevo estudiante y genera código de acceso
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Características:
+
+Genera código de estudiante automático (EST + AÑO + CONSECUTIVO)
+Genera código de acceso aleatorio de 8 caracteres
+Encripta código de acceso
+Incrementa cupos ocupados del programa
+Valida que haya cupos disponibles
+Response Especial:
+
+json{
+  "success": true,
+  "message": "Estudiante registrado exitosamente",
+  "data": {
+    "estudiante": {...},
+    "codigoAccesoTemporal": "ABC12XYZ",
+    "mensaje": "IMPORTANTE: Guarda este código. No se volverá a mostrar."
+  }
+}
+loginEstudiante(req, res)
+Descripción: Autentica estudiante con código de estudiante + código de acceso
+Requiere Auth: No
+Request Body:
+json{
+  "codigoEstudiante": "EST20250001",
+  "codigoAcceso": "ABC12XYZ"
+}
+obtenerPerfilEstudiante(req, res)
+Descripción: Obtiene perfil del estudiante autenticado
+Requiere Auth: Sí (token de estudiante)
+obtenerEstudiantes(req, res)
+Descripción: Lista estudiantes con filtros
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Query Params:
+
+estado: Filtrar por estado (activo, inactivo, graduado, etc.)
+programa: Filtrar por ID de programa
+jornada: Filtrar por jornada
+limit: Límite de resultados (default: 20)
+page: Página actual (default: 1)
+
+buscarEstudiantes(req, res)
+Descripción: Búsqueda avanzada de estudiantes
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Query Params:
+
+q: Término de búsqueda (min 3 caracteres)
+Busca en: nombre, apellido, email, codigoEstudiante, documento.numero
+
+cambiarEstadoEstudiante(req, res)
+Descripción: Cambia estado académico del estudiante
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Request Body:
+json{
+  "estado": "graduado"
+}
+Estados válidos: activo, inactivo, graduado, retirado, suspendido
+resetearCodigoAcceso(req, res)
+Descripción: Genera nuevo código de acceso para un estudiante
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Response:
+json{
+  "success": true,
+  "message": "Código de acceso reseteado exitosamente",
+  "data": {
+    "codigoEstudiante": "EST20250001",
+    "nombreCompleto": "Laura Gómez",
+    "nuevoCodigoAcceso": "XYZ98ABC",
+    "mensaje": "IMPORTANTE: Comunica este código al estudiante."
+  }
+}
+
+5.4 Noticia Controller (noticia.controller.js)
+Funciones Implementadas
+obtenerNoticias(req, res)
+Descripción: Lista noticias públicas activas
+Requiere Auth: No
+Query Params:
+
+categoria: Filtrar por categoría
+destacada: true/false
+limit: Límite (default: 10)
+page: Página (default: 1)
+
+obtenerNoticiaPorId(req, res)
+Descripción: Obtiene una noticia específica
+Requiere Auth: No
+crearNoticia(req, res)
+Descripción: Crea nueva noticia
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Características:
+
+Registra usuario que crea (creadoPor)
+Asigna autor automático si no se especifica
+
+actualizarNoticia(req, res)
+Descripción: Actualiza noticia existente
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Características:
+
+Registra usuario que actualiza (actualizadoPor)
+
+eliminarNoticia(req, res)
+Descripción: Elimina noticia (soft delete)
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Características:
+
+Marca activa: false
+No elimina físicamente el registro
+
+
+5.5 Evento Controller (evento.controller.js)
+Funciones Implementadas
+obtenerEventos(req, res)
+Descripción: Lista eventos públicos activos
+Requiere Auth: No
+Query Params:
+
+tipo: Filtrar por tipo
+destacado: true/false
+proximos: true (solo eventos futuros)
+limit: Límite (default: 10)
+page: Página (default: 1)
+
+obtenerEventoPorId(req, res)
+Descripción: Obtiene un evento específico
+Requiere Auth: No
+crearEvento(req, res)
+Descripción: Crea nuevo evento
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+actualizarEvento(req, res)
+Descripción: Actualiza evento existente
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+eliminarEvento(req, res)
+Descripción: Elimina evento (soft delete)
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+inscribirseEvento(req, res)
+Descripción: Inscribe a un usuario a un evento
+Requiere Auth: No (público)
+Validaciones:
+
+Verifica que requiera inscripción
+Verifica capacidad disponible
+Verifica que no sea evento pasado
+Incrementa contador de inscritos
+
+
+5.6 Testimonio Controller (testimonio.controller.js)
+Funciones Implementadas
+obtenerTestimonios(req, res)
+Descripción: Lista testimonios aprobados y activos
+Requiere Auth: No
+Query Params:
+
+destacado: true/false
+programa: Nombre del programa
+limit: Límite (default: 10)
+page: Página (default: 1)
+
+obtenerTestimonioPorId(req, res)
+Descripción: Obtiene un testimonio específico
+Requiere Auth: No
+Nota: Solo muestra si está aprobado y activo
+crearTestimonio(req, res)
+Descripción: Envía nuevo testimonio (público)
+Requiere Auth: No
+Características:
+
+Se crea con aprobado: false
+Queda pendiente de aprobación administrativa
+Response:
+
+json{
+  "success": true,
+  "message": "Testimonio enviado. Pendiente de aprobación.",
+  "data": {...}
+}
+obtenerTestimoniosPendientes(req, res)
+Descripción: Lista testimonios pendientes de aprobación
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+obtenerTodosTestimonios(req, res)
+Descripción: Lista todos los testimonios (aprobados, pendientes, rechazados)
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Query Params:
+
+aprobado: true/false
+activo: true/false
+limit: Límite (default: 20)
+page: Página (default: 1)
+
+aprobarTestimonio(req, res)
+Descripción: Aprueba un testimonio
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Características:
+
+Marca aprobado: true
+Asigna fechaAprobacion y fechaPublicacion
+Registra aprobadoPor
+
+rechazarTestimonio(req, res)
+Descripción: Rechaza un testimonio
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+Características:
+
+Marca activo: false
+
+marcarDestacado(req, res)
+Descripción: Marca/desmarca testimonio como destacado
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+actualizarTestimonio(req, res)
+Descripción: Actualiza datos de un testimonio
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+eliminarTestimonio(req, res)
+Descripción: Elimina testimonio (soft delete)
+Requiere Auth: Sí
+Rol Requerido: admin/superadmin
+
+5.7 Programa Controller (programa.controller.js)
+Funciones Implementadas
+obtenerProgramas(req, res)
+Descripción: Lista programas activos
+Requiere Auth: No
+Query Params:
+
+modalidad: Filtrar por modalidad
+destacado: true/false
+disponible: true/false (inscripción abierta)
+limit: Límite (default: 20)
+page: Página (default: 1)
+
+obtenerProgramaPorId(req, res)
+Descripción: Obtiene un programa específico
+Requiere Auth: No
+obtenerProgramaPorCodigo(req, res)
+Descripción: Obtiene programa por código único
+Requiere Auth: No
+Ejemplo: /api/programas/codigo/TLS-001
+obtenerProgramasDisponibles(req, res)
+Descripción: Lista programas con inscripción abierta y cupos disponibles
+Requiere Auth: No
+obtenerTodosProgramas(req, res)
+Descripción: Lista todos los programas (incluye inactivos)
+Requiere Auth: Sí
+Rol Requerido: admin/supera

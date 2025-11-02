@@ -1,0 +1,12 @@
+{
+    "success": true,
+    "message": "Usuario registrado exitosamente",
+    "data": {
+        "id": "69037172a60d4828b59b4678",
+        "nombre": "Kevin",
+        "apellido": "Peña",
+        "email": "admin@fundaestecnicos.edu.co",
+        "rol": "superadmin"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MDM3MTcyYTYwZDQ4MjhiNTliNDY3OCIsImlhdCI6MTc2MTgzMzMzMCwiZXhwIjoxNzYyNDM4MTMwfQ.I9t0JE-XKqH-AB8HvNcOY6yzr1_d5HV5yV_NVrGKw4c"
+}

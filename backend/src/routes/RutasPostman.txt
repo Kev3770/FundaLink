@@ -1,0 +1,650 @@
+ 1. TEST / VERIFICACIÓN
+1.1 - Verificar API funcionando
+
+Método: GET
+URL: http://localhost:4000/
+Auth: Ninguna
+Body: Ninguno
+
+1.2 - Ruta de prueba
+
+Método: GET
+URL: http://localhost:4000/api/test
+Auth: Ninguna
+Body: Ninguno
+
+
+📁 2. USUARIOS (Administradores)
+2.1 - Registrar usuario
+
+Método: POST
+URL: http://localhost:4000/api/usuarios/registro
+Auth: Ninguna (o Bearer Token para crear más usuarios)
+Body (JSON):
+
+json{
+  "nombre": "Kevin",
+  "apellido": "Peña",
+  "email": "admin@fundaestecnicos.edu.co",
+  "password": "admin123",
+  "rol": "superadmin"
+}
+2.2 - Login de usuario
+
+Método: POST
+URL: http://localhost:4000/api/usuarios/login
+Auth: Ninguna
+Body (JSON):
+
+json{
+  "email": "admin@fundaestecnicos.edu.co",
+  "password": "admin123"
+}
+2.3 - Obtener perfil (usuario autenticado)
+
+Método: GET
+URL: http://localhost:4000/api/usuarios/perfil
+Auth: Bearer Token
+Body: Ninguno
+
+2.4 - Obtener todos los usuarios
+
+Método: GET
+URL: http://localhost:4000/api/usuarios
+Auth: Bearer Token (superadmin)
+Body: Ninguno
+
+2.5 - Actualizar usuario
+
+Método: PUT
+URL: http://localhost:4000/api/usuarios/[ID_USUARIO]
+Auth: Bearer Token (superadmin)
+Body (JSON):
+
+json{
+  "nombre": "Kevin Alejandro",
+  "telefono": "3001234567"
+}
+2.6 - Cambiar contraseña
+
+Método: PUT
+URL: http://localhost:4000/api/usuarios/cambiar-password
+Auth: Bearer Token
+Body (JSON):
+
+json{
+  "passwordActual": "admin123",
+  "passwordNuevo": "nuevaPassword456"
+}
+2.7 - Desactivar usuario
+
+Método: DELETE
+URL: http://localhost:4000/api/usuarios/[ID_USUARIO]
+Auth: Bearer Token (superadmin)
+Body: Ninguno
+
+
+📁 3. NOTICIAS
+3.1 - Obtener todas las noticias (público)
+
+Método: GET
+URL: http://localhost:4000/api/noticias
+Auth: Ninguna
+Body: Ninguno
+
+3.2 - Obtener noticias destacadas (público)
+
+Método: GET
+URL: http://localhost:4000/api/noticias?destacada=true
+Auth: Ninguna
+Body: Ninguno
+
+3.3 - Obtener noticias por categoría (público)
+
+Método: GET
+URL: http://localhost:4000/api/noticias?categoria=Académica
+Auth: Ninguna
+Body: Ninguno
+
+3.4 - Obtener noticia por ID (público)
+
+Método: GET
+URL: http://localhost:4000/api/noticias/[ID_NOTICIA]
+Auth: Ninguna
+Body: Ninguno
+
+3.5 - Crear noticia (admin)
+
+Método: POST
+URL: http://localhost:4000/api/noticias
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "titulo": "Inscripciones Abiertas 2025",
+  "contenido": "Les informamos que ya están abiertas las inscripciones para el periodo académico 2025-1. Los programas disponibles son: Técnico en Sistemas, Contabilidad y Diseño Gráfico. Para más información comuníquese con secretaría académica.",
+  "categoria": "Administrativa",
+  "destacada": true
+}
+3.6 - Actualizar noticia (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/noticias/[ID_NOTICIA]
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "titulo": "Inscripciones Abiertas 2025 - ACTUALIZADO",
+  "contenido": "Fecha límite extendida hasta el 31 de enero.",
+  "destacada": true
+}
+3.7 - Eliminar noticia (admin)
+
+Método: DELETE
+URL: http://localhost:4000/api/noticias/[ID_NOTICIA]
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+
+📁 4. EVENTOS
+4.1 - Obtener todos los eventos (público)
+
+Método: GET
+URL: http://localhost:4000/api/eventos
+Auth: Ninguna
+Body: Ninguno
+
+4.2 - Obtener eventos próximos (público)
+
+Método: GET
+URL: http://localhost:4000/api/eventos?proximos=true
+Auth: Ninguna
+Body: Ninguno
+
+4.3 - Obtener eventos destacados (público)
+
+Método: GET
+URL: http://localhost:4000/api/eventos?destacado=true
+Auth: Ninguna
+Body: Ninguno
+
+4.4 - Filtrar eventos por tipo (público)
+
+Método: GET
+URL: http://localhost:4000/api/eventos?tipo=Académico
+Auth: Ninguna
+Body: Ninguno
+
+4.5 - Obtener evento por ID (público)
+
+Método: GET
+URL: http://localhost:4000/api/eventos/[ID_EVENTO]
+Auth: Ninguna
+Body: Ninguno
+
+4.6 - Crear evento (admin)
+
+Método: POST
+URL: http://localhost:4000/api/eventos
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "nombre": "Ceremonia de Graduación 2025",
+  "descripcion": "Celebración de graduación de la promoción 2025. Invitamos a estudiantes, familiares y amigos a ser parte de este momento especial.",
+  "fecha": "2025-12-15",
+  "horaInicio": "10:00 AM",
+  "horaFin": "12:00 PM",
+  "lugar": "Auditorio Principal - FUNDAESTÉCNICOS",
+  "tipo": "Institucional",
+  "capacidadMaxima": 500,
+  "requiereInscripcion": true,
+  "destacado": true
+}
+4.7 - Inscribirse a evento (público)
+
+Método: POST
+URL: http://localhost:4000/api/eventos/[ID_EVENTO]/inscribirse
+Auth: Ninguna
+Body: Ninguno
+
+4.8 - Actualizar evento (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/eventos/[ID_EVENTO]
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "capacidadMaxima": 600,
+  "destacado": true
+}
+4.9 - Eliminar evento (admin)
+
+Método: DELETE
+URL: http://localhost:4000/api/eventos/[ID_EVENTO]
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+
+📁 5. TESTIMONIOS
+5.1 - Obtener testimonios aprobados (público)
+
+Método: GET
+URL: http://localhost:4000/api/testimonios
+Auth: Ninguna
+Body: Ninguno
+
+5.2 - Obtener testimonios destacados (público)
+
+Método: GET
+URL: http://localhost:4000/api/testimonios?destacado=true
+Auth: Ninguna
+Body: Ninguno
+
+5.3 - Filtrar por programa (público)
+
+Método: GET
+URL: http://localhost:4000/api/testimonios?programa=Técnico en Sistemas
+Auth: Ninguna
+Body: Ninguno
+
+5.4 - Obtener testimonio por ID (público)
+
+Método: GET
+URL: http://localhost:4000/api/testimonios/[ID_TESTIMONIO]
+Auth: Ninguna
+Body: Ninguno
+
+5.5 - Crear testimonio (público)
+
+Método: POST
+URL: http://localhost:4000/api/testimonios
+Auth: Ninguna
+Body (JSON):
+
+json{
+  "nombre": "María",
+  "apellido": "González",
+  "email": "maria.gonzalez@email.com",
+  "testimonio": "Mi experiencia en FUNDAESTÉCNICOS fue excepcional. Los profesores son muy profesionales y el ambiente de aprendizaje es increíble. Gracias a la formación recibida, hoy trabajo en una empresa reconocida del sector tecnológico.",
+  "programa": "Técnico en Sistemas",
+  "promocion": "2023",
+  "ocupacionActual": "Desarrolladora Web",
+  "empresaActual": "TechCorp S.A.",
+  "calificacion": 5
+}
+5.6 - Obtener testimonios pendientes (admin)
+
+Método: GET
+URL: http://localhost:4000/api/testimonios/admin/pendientes
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+5.7 - Obtener todos los testimonios (admin)
+
+Método: GET
+URL: http://localhost:4000/api/testimonios/admin/todos
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+5.8 - Aprobar testimonio (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/testimonios/[ID_TESTIMONIO]/aprobar
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+5.9 - Rechazar testimonio (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/testimonios/[ID_TESTIMONIO]/rechazar
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+5.10 - Marcar como destacado (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/testimonios/[ID_TESTIMONIO]/destacado
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "destacado": true
+}
+5.11 - Actualizar testimonio (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/testimonios/[ID_TESTIMONIO]
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "testimonio": "Testimonio actualizado por el administrador",
+  "calificacion": 5
+}
+5.12 - Eliminar testimonio (admin)
+
+Método: DELETE
+URL: http://localhost:4000/api/testimonios/[ID_TESTIMONIO]
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+
+📁 6. PROGRAMAS EDUCATIVOS
+6.1 - Obtener todos los programas (público)
+
+Método: GET
+URL: http://localhost:4000/api/programas
+Auth: Ninguna
+Body: Ninguno
+
+6.2 - Obtener programas destacados (público)
+
+Método: GET
+URL: http://localhost:4000/api/programas?destacado=true
+Auth: Ninguna
+Body: Ninguno
+
+6.3 - Obtener programas disponibles (público)
+
+Método: GET
+URL: http://localhost:4000/api/programas/disponibles
+Auth: Ninguna
+Body: Ninguno
+
+6.4 - Filtrar por modalidad (público)
+
+Método: GET
+URL: http://localhost:4000/api/programas?modalidad=Presencial
+Auth: Ninguna
+Body: Ninguno
+
+6.5 - Obtener programa por código (público)
+
+Método: GET
+URL: http://localhost:4000/api/programas/codigo/TLS-001
+Auth: Ninguna
+Body: Ninguno
+
+6.6 - Obtener programa por ID (público)
+
+Método: GET
+URL: http://localhost:4000/api/programas/[ID_PROGRAMA]
+Auth: Ninguna
+Body: Ninguno
+
+6.7 - Crear programa (admin)
+
+Método: POST
+URL: http://localhost:4000/api/programas
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "nombre": "Técnico Laboral en Sistemas",
+  "codigo": "TLS-001",
+  "descripcion": "Programa enfocado en formar técnicos capacitados en el desarrollo, mantenimiento y soporte de sistemas informáticos. Los estudiantes adquieren habilidades en programación, redes, bases de datos y soporte técnico.",
+  "duracion": {
+    "valor": 18,
+    "unidad": "meses"
+  },
+  "modalidad": "Presencial",
+  "jornada": "Diurna",
+  "requisitos": [
+    "Título de bachiller",
+    "Mayor de 16 años",
+    "Fotocopia del documento de identidad",
+    "Dos fotografías 3x4 fondo blanco"
+  ],
+  "objetivos": "Formar técnicos laborales competentes en el análisis, desarrollo e implementación de soluciones informáticas.",
+  "perfilEgresado": "El egresado estará capacitado para desarrollar software básico, administrar redes, dar soporte técnico y gestionar bases de datos.",
+  "competencias": [
+    "Programación en Python, Java y JavaScript",
+    "Administración de bases de datos",
+    "Configuración y mantenimiento de redes",
+    "Soporte técnico de hardware y software"
+  ],
+  "campoLaboral": "Empresas de tecnología, departamentos de TI, consultorías informáticas, emprendimiento tecnológico.",
+  "materias": [
+    "Fundamentos de Programación",
+    "Bases de Datos",
+    "Redes y Comunicaciones",
+    "Desarrollo Web",
+    "Sistemas Operativos"
+  ],
+  "costos": {
+    "matricula": 200000,
+    "mensualidad": 150000,
+    "moneda": "COP"
+  },
+  "inscripcion": {
+    "disponible": true,
+    "cuposDisponibles": 30,
+    "fechaInicio": "2025-02-01",
+    "fechaCierre": "2025-01-25"
+  },
+  "destacado": true,
+  "orden": 1
+}
+6.8 - Obtener todos los programas (admin)
+
+Método: GET
+URL: http://localhost:4000/api/programas/admin/todos
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+6.9 - Actualizar programa (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/programas/[ID_PROGRAMA]
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "costos": {
+    "matricula": 220000,
+    "mensualidad": 160000
+  },
+  "inscripcion": {
+    "cuposDisponibles": 35
+  }
+}
+6.10 - Marcar programa como destacado (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/programas/[ID_PROGRAMA]/destacado
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "destacado": true
+}
+6.11 - Actualizar disponibilidad (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/programas/[ID_PROGRAMA]/disponibilidad
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "disponible": false
+}
+6.12 - Eliminar programa (admin)
+
+Método: DELETE
+URL: http://localhost:4000/api/programas/[ID_PROGRAMA]
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+
+📁 7. ESTUDIANTES
+7.1 - Login de estudiante (público)
+
+Método: POST
+URL: http://localhost:4000/api/estudiantes/login
+Auth: Ninguna
+Body (JSON):
+
+json{
+  "codigoEstudiante": "EST20250001",
+  "codigoAcceso": "ABC12XYZ"
+}
+7.2 - Obtener perfil del estudiante
+
+Método: GET
+URL: http://localhost:4000/api/estudiantes/perfil
+Auth: Bearer Token (estudiante)
+Body: Ninguno
+
+7.3 - Registrar estudiante (admin)
+
+Método: POST
+URL: http://localhost:4000/api/estudiantes
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "codigoEstudiante": "EST20250002",
+  "codigoAcceso": "XYZ45LMN",
+  "nombre": "Laura",
+  "apellido": "Gómez",
+  "documento": {
+    "tipo": "CC",
+    "numero": "1234567890"
+  },
+  "email": "laura.gomez@email.com",
+  "telefono": "3001234567",
+  "fechaNacimiento": "2005-03-15",
+  "genero": "Femenino",
+  "direccion": {
+    "calle": "Calle 10 #20-30",
+    "ciudad": "Cali",
+    "departamento": "Valle del Cauca",
+    "codigoPostal": "760001"
+  },
+  "programa": "[ID_DEL_PROGRAMA]",
+  "jornada": "Diurna",
+  "contactoEmergencia": {
+    "nombre": "María Gómez",
+    "relacion": "Madre",
+    "telefono": "3009876543"
+  }
+}
+7.4 - Obtener todos los estudiantes (admin)
+
+Método: GET
+URL: http://localhost:4000/api/estudiantes
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+7.5 - Filtrar estudiantes por estado (admin)
+
+Método: GET
+URL: http://localhost:4000/api/estudiantes?estado=activo
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+7.6 - Filtrar por programa (admin)
+
+Método: GET
+URL: http://localhost:4000/api/estudiantes?programa=[ID_PROGRAMA]
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+7.7 - Buscar estudiantes (admin)
+
+Método: GET
+URL: http://localhost:4000/api/estudiantes/buscar?q=Laura
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+7.8 - Obtener estudiante por ID (admin)
+
+Método: GET
+URL: http://localhost:4000/api/estudiantes/[ID_ESTUDIANTE]
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+7.9 - Actualizar estudiante (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/estudiantes/[ID_ESTUDIANTE]
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "telefono": "3101234567",
+  "email": "nuevo.email@example.com"
+}
+7.10 - Cambiar estado de estudiante (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/estudiantes/[ID_ESTUDIANTE]/estado
+Auth: Bearer Token (admin/superadmin)
+Body (JSON):
+
+json{
+  "estado": "graduado"
+}
+7.11 - Resetear código de acceso (admin)
+
+Método: PUT
+URL: http://localhost:4000/api/estudiantes/[ID_ESTUDIANTE]/resetear-codigo
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+7.12 - Desactivar estudiante (admin)
+
+Método: DELETE
+URL: http://localhost:4000/api/estudiantes/[ID_ESTUDIANTE]
+Auth: Bearer Token (admin/superadmin)
+Body: Ninguno
+
+
+📋 RESUMEN DE RUTAS POR TIPO
+Rutas Públicas (sin autenticación):
+
+✅ GET / - Verificar API
+✅ GET /api/test - Ruta de prueba
+✅ POST /api/usuarios/login - Login admin
+✅ GET /api/noticias - Ver noticias
+✅ GET /api/eventos - Ver eventos
+✅ POST /api/testimonios - Enviar testimonio
+✅ GET /api/testimonios - Ver testimonios aprobados
+✅ GET /api/programas - Ver programas
+✅ POST /api/estudiantes/login - Login estudiante
+
+Rutas Protegidas (Admin/Superadmin):
+
+🔒 POST /api/noticias - Crear noticia
+🔒 PUT /api/noticias/:id - Actualizar noticia
+🔒 DELETE /api/noticias/:id - Eliminar noticia
+🔒 POST /api/eventos - Crear evento
+🔒 PUT /api/eventos/:id - Actualizar evento
+🔒 DELETE /api/eventos/:id - Eliminar evento
+🔒 PUT /api/testimonios/:id/aprobar - Aprobar testimonio
+🔒 POST /api/programas - Crear programa
+🔒 POST /api/estudiantes - Registrar estudiante
+🔒 GET /api/usuarios - Ver todos los usuarios
+
+Rutas Protegidas (Estudiantes):
+
+🎓 GET /api/estudiantes/perfil - Ver perfil propio
+
+
+🎯 ORDEN RECOMENDADO PARA PROBAR EN POSTMAN:
+
+Crear usuario admin (POST /api/usuarios/registro)
+Login admin (POST /api/usuarios/login) → Guardar token
+Crear programas (POST /api/programas) → Guardar IDs
+Crear noticias (POST /api/noticias)
+Crear eventos (POST /api/eventos)
+Crear testimonios (POST /api/testimonios)
+Aprobar testimonios (PUT /api/testimonios/:id/aprobar)
+Registrar estudiante (POST /api/estudiantes) → Guardar código de acceso
+Login estudiante (POST /api/estudiantes/login)
+Ver perfil estudiante (GET /api/estudiantes/perfil)
+
+
+¿Quieres que te ayude a crear la colección de Postman en formato JSON para importarla directamente? 🚀
